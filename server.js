@@ -1,4 +1,4 @@
-// Load env variables
+// Load environment variables
 require("dotenv").config();
 
 const express = require("express");
@@ -8,15 +8,13 @@ const cors = require("cors");
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: "*"
-}));
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-// ✅ Get MongoDB URL from .env
+// ✅ MongoDB URL from environment
 const url = process.env.MONGO_URI;
 
-// Create client
+// Create MongoDB client
 const client = new MongoClient(url);
 
 // Start server function
@@ -54,9 +52,10 @@ async function startServer() {
       res.send("Backend running with MongoDB Atlas 🚀");
     });
 
-    // Start server
+    // Port (Render or local)
     const PORT = process.env.PORT || 5000;
 
+    // Start server
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT} 🚀`);
     });
