@@ -7,31 +7,35 @@ const cors = require("cors");
 
 const app = express();
 
+// ✅ SIMPLE & SAFE CORS (no error)
+app.use(cors());
+
 // Middleware
-app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-// ✅ MongoDB URL from environment
+// MongoDB URL
 const url = process.env.MONGO_URI;
 
-// Create MongoDB client
+// MongoDB client
 const client = new MongoClient(url);
 
-// Start server function
+// Start server
 async function startServer() {
   try {
-    // Connect to MongoDB Atlas
     await client.connect();
     console.log("MongoDB Atlas Connected ✅");
 
-    // Database & collection
     const db = client.db("portfolioDB");
     const collection = db.collection("contacts");
 
-    // POST API (save form data)
+    // ✅ POST route
     app.post("/contact", async (req, res) => {
       try {
         const { name, email, message } = req.body;
+
+        if (!name || !email || !message) {
+          return res.status(400).json({ message: "All fields required" });
+        }
 
         await collection.insertOne({
           name,
@@ -40,22 +44,21 @@ async function startServer() {
           createdAt: new Date()
         });
 
-        res.json({ message: "Message saved successfully!" });
+        res.status(200).json({ message: "Message saved successfully!" });
       } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Error saving message" });
       }
     });
 
-    // GET API (test route)
+    // ✅ TEST route
     app.get("/", (req, res) => {
       res.send("Backend running with MongoDB Atlas 🚀");
     });
 
-    // Port (Render or local)
+    // PORT
     const PORT = process.env.PORT || 5000;
 
-    // Start server
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT} 🚀`);
     });
@@ -65,5 +68,4 @@ async function startServer() {
   }
 }
 
-// Run server
 startServer();
